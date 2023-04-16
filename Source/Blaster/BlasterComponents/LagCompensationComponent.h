@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+	// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -58,14 +58,21 @@ struct FFramePackage
 USTRUCT(BlueprintType)
 struct FServerSideRewindResult
 {
-	
+	// Default constructor
+	/*
+	FServerSideRewindResult()
+		: bHitConfirmed(false)
+		, bHeadShot(false)
+	{}
+	*/
+
 	GENERATED_BODY()
 
 	UPROPERTY()
-	bool bHitConfirmed;
+	bool bHitConfirmed= false;
 
 	UPROPERTY()
-	bool bHeadShot;
+	bool bHeadShot= false;
 
 };
 
