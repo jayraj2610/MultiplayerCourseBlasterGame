@@ -18,6 +18,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void MenuSetup(int32 NumberOfPublicConnections = 4, FString TypeOfMatch = FString(TEXT("FreeForAll")), FString LobbyPath = FString(TEXT("/Game/ThirdPersonCPP/Maps/Lobby")));
 
+	UFUNCTION(BlueprintCallable)
+	FString GetSubsystemName();
+
 protected:
 
 	virtual bool Initialize() override;

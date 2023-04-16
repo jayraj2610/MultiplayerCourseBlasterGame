@@ -121,6 +121,19 @@ void UMultiplayerSessionsSubsystem::StartSession()
 {
 }
 
+FString UMultiplayerSessionsSubsystem::GetSubsystemName()
+{
+
+	FString SubsystemName = IOnlineSubsystem::Get()->GetSubsystemName().ToString();
+
+	if (SubsystemName.IsEmpty())
+	{
+		return FString("NULL");
+	}
+
+	return SubsystemName;
+}
+
 void UMultiplayerSessionsSubsystem::OnCreateSessionComplete(FName SessionName, bool bWasSuccessful)
 {
 	if (SessionInterface)

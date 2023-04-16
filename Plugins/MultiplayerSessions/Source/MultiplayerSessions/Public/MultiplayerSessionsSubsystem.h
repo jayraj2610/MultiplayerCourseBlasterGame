@@ -36,6 +36,9 @@ public:
 	void DestroySession();
 	void StartSession();
 
+	FString GetSubsystemName();
+
+
 	//
 	// Our own custom delegates for the Menu class to bind callbacks to
 	//

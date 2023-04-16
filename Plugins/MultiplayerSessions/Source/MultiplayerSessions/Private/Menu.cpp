@@ -46,6 +46,13 @@ void UMenu::MenuSetup(int32 NumberOfPublicConnections, FString TypeOfMatch, FStr
 	}
 }
 
+FString UMenu::GetSubsystemName()
+{
+	
+
+	return MultiplayerSessionsSubsystem->GetSubsystemName();
+}
+
 bool UMenu::Initialize()
 {
 	if (!Super::Initialize())
