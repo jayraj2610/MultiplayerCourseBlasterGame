@@ -24,7 +24,7 @@ void UMultiplayerSessionsSubsystem::CreateSession(int32 NumPublicConnections, FS
 		return;
 	}
 
-	auto ExistingSession = SessionInterface->GetNamedSession(NAME_GameSession);
+	auto ExistingSession = SessionInterface->GetNamedSession(JK_Game_SessionName);
 	if (ExistingSession != nullptr)
 	{
 		bCreateSessionOnDestroy = true;
@@ -49,7 +49,7 @@ void UMultiplayerSessionsSubsystem::CreateSession(int32 NumPublicConnections, FS
 	LastSessionSettings->bUseLobbiesIfAvailable = true;
 
 	const ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController();
-	if (!SessionInterface->CreateSession(*LocalPlayer->GetPreferredUniqueNetId(), NAME_GameSession, *LastSessionSettings))
+	if (!SessionInterface->CreateSession(*LocalPlayer->GetPreferredUniqueNetId(), JK_Game_SessionName, *LastSessionSettings))
 	{
 		SessionInterface->ClearOnCreateSessionCompleteDelegate_Handle(CreateSessionCompleteDelegateHandle);
 
@@ -92,7 +92,7 @@ void UMultiplayerSessionsSubsystem::JoinSession(const FOnlineSessionSearchResult
 	JoinSessionCompleteDelegateHandle = SessionInterface->AddOnJoinSessionCompleteDelegate_Handle(JoinSessionCompleteDelegate);
 
 	const ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController();
-	if (!SessionInterface->JoinSession(*LocalPlayer->GetPreferredUniqueNetId(), NAME_GameSession, SessionResult))
+	if (!SessionInterface->JoinSession(*LocalPlayer->GetPreferredUniqueNetId(), JK_Game_SessionName, SessionResult))
 	{
 		SessionInterface->ClearOnJoinSessionCompleteDelegate_Handle(JoinSessionCompleteDelegateHandle);
 
@@ -110,7 +110,7 @@ void UMultiplayerSessionsSubsystem::DestroySession()
 
 	DestroySessionCompleteDelegateHandle = SessionInterface->AddOnDestroySessionCompleteDelegate_Handle(DestroySessionCompleteDelegate);
 
-	if (!SessionInterface->DestroySession(NAME_GameSession))
+	if (!SessionInterface->DestroySession(JK_Game_SessionName))
 	{
 		SessionInterface->ClearOnDestroySessionCompleteDelegate_Handle(DestroySessionCompleteDelegateHandle);
 		MultiplayerOnDestroySessionComplete.Broadcast(false);
@@ -119,6 +119,20 @@ void UMultiplayerSessionsSubsystem::DestroySession()
 
 void UMultiplayerSessionsSubsystem::StartSession()
 {
+	UE_LOG(LogTemp, VeryVerbose, TEXT("UMultiplayerSessionsSubsystem::StartSession()"));
+	if (!SessionInterface.IsValid())
+	{
+		UE_LOG(LogTemp, Error, TEXT("UMultiplayerSessionsSubsystem::JoinSession() SessionInterface is not valid"));
+		return;
+	}
+	StartSessionCompleteDelegateHandle = SessionInterface->AddOnStartSessionCompleteDelegate_Handle(StartSessionCompleteDelegate);
+	if (!SessionInterface->StartSession(JK_Game_SessionName))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UMultiplayerSessionsSubsystem::StartSession() SessionInterface->StartSession() failed"));
+		SessionInterface->ClearOnStartSessionCompleteDelegate_Handle(StartSessionCompleteDelegateHandle);
+		MultiplayerOnStartSessionComplete.Broadcast(false);
+	}
+
 }
 
 FString UMultiplayerSessionsSubsystem::GetSubsystemName()
@@ -168,6 +182,8 @@ void UMultiplayerSessionsSubsystem::OnJoinSessionComplete(FName SessionName, EOn
 	}
 
 	MultiplayerOnJoinSessionComplete.Broadcast(Result);
+
+	StartSession();
 }
 
 void UMultiplayerSessionsSubsystem::OnDestroySessionComplete(FName SessionName, bool bWasSuccessful)
@@ -186,6 +202,12 @@ void UMultiplayerSessionsSubsystem::OnDestroySessionComplete(FName SessionName, 
 
 void UMultiplayerSessionsSubsystem::OnStartSessionComplete(FName SessionName, bool bWasSuccessful)
 {
+	UE_LOG(LogTemp, VeryVerbose, TEXT("UMultiplayerSessionsSubsystem::OnStartSessionComplete(%s, %s)"), *SessionName.ToString(), bWasSuccessful ? TEXT("true") : TEXT("false"));
+	if (SessionInterface)
+	{
+		SessionInterface->ClearOnStartSessionCompleteDelegate_Handle(StartSessionCompleteDelegateHandle);
+	}
+	MultiplayerOnStartSessionComplete.Broadcast(bWasSuccessful);
 }
 
 bool UMultiplayerSessionsSubsystem::IsValidSessionInterface()

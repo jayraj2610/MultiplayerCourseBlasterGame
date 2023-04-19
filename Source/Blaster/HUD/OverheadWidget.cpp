@@ -3,6 +3,16 @@
 
 #include "OverheadWidget.h"
 #include "Components/TextBlock.h"
+#include "GameFramework/PlayerState.h"
+
+void UOverheadWidget::SetPlayerNameText(FString TextToDisplay)
+{
+	if (PlayerNameText)
+	{
+		PlayerNameText->SetText(FText::FromString(TextToDisplay));
+	}
+
+}
 
 void UOverheadWidget::SetDisplayText(FString TextToDisplay)
 {
@@ -41,6 +51,15 @@ void UOverheadWidget::ShowPlayerNetRole(APawn* InPawn)
 	Super::OnLevelRemovedFromWorld(InLevel, InWorld);
 }
 */
+
+void UOverheadWidget::ShowPlayerDisplayName(APawn* InPawn)
+{
+	
+	FString PlayerName = InPawn->GetPlayerState()->GetPlayerName();
+	SetPlayerNameText(PlayerName);
+}
+
+
 void UOverheadWidget::NativeDestruct()
 {
 

@@ -87,4 +87,5 @@ private:
 	bool bCreateSessionOnDestroy{ false };
 	int32 LastNumPublicConnections;
 	FString LastMatchType;
+	FName JK_Game_SessionName = FName(TEXT("JKGameSession"));
 };
