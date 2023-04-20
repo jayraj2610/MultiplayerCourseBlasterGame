@@ -64,4 +64,5 @@ private:
 	FString MatchType{TEXT("FreeForAll")};
 
 	FString PathToLobby{TEXT("")};
+	FName JK_Game_SessionName = FName(TEXT("JKGameSession"));
 };
